@@ -19,13 +19,14 @@ while True:
     blue = client.read_coils(3)[0]
 
     ret, frame = Cap.read()
+    blur = cv2.GaussianBlur(frame, (25, 25), 10)
+    print(blur)
 
-    lower_yellow, upper_yellow, lower_green, upper_green, lower_red, upper_red, lower_blue, upper_blue = Kuka.calibrate(frame)
+    lower_yellow, upper_yellow, lower_green, upper_green, lower_red, upper_red, lower_blue, upper_blue = Kuka.calibrate(blur)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     if yellow:
         mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
-        print(mask)
         x, y = Kuka.find(mask)
         cv2.circle(frame, (x, y), 7, (0, 0, 0), -1)
         cv2.putText(frame, "Yellow", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)

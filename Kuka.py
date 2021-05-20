@@ -99,13 +99,9 @@ def calibrate(frame):
 
 def find(mask):
     x = y = 0
-    contour = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contour = imutils.grab_contours(contour)
-    for c in contour:
-        area = cv2.contourArea(c)
-        if area > 500:
-            m = cv2.moments(c)
-            x = int(m["m10"] / m["m00"])
-            y = int(m["m01"] / m["m00"])
-            return x, y
+    contours, h = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        if cv2.contourArea(contour) > 500:
+            x, y, w, h = cv2.boundingRect(contour)
+            return x + w//2, y + h//2
     return x, y
