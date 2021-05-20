@@ -1,7 +1,7 @@
 from pyModbusTCP.server import ModbusServer, DataBank
 from time import sleep
 
-server = ModbusServer("192.168.1.192", 502)
+server = ModbusServer("192.168.0.101", 502)
 
 print(server.host)
 

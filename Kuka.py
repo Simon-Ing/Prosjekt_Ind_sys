@@ -1,39 +1,38 @@
 import cv2
 import numpy as np
 
-import imutils
 
 def nothing(x):
     pass
 
 
 def init_GUI():
-    cv2.namedWindow("GUI", cv2.WINDOW_KEEPRATIO)
-    cv2.createTrackbar("LH_YELLOW", "GUI", 9, 255, nothing)
-    cv2.createTrackbar("LS_YELLOW", "GUI", 29, 255, nothing)
-    cv2.createTrackbar("LV_YELLOW", "GUI", 194, 255, nothing)
-    cv2.createTrackbar("UH_YELLOW", "GUI", 33, 255, nothing)
-    cv2.createTrackbar("US_YELLOW", "GUI", 151, 255, nothing)
-    cv2.createTrackbar("UV_YELLOW", "GUI", 255, 255, nothing)
+    cv2.namedWindow("GUI", cv2.WINDOW_NORMAL)
+    cv2.createTrackbar("LH_YELLOW", "GUI", 25, 255, nothing)
+    cv2.createTrackbar("LS_YELLOW", "GUI", 30, 255, nothing)
+    cv2.createTrackbar("LV_YELLOW", "GUI", 100, 255, nothing)
+    cv2.createTrackbar("UH_YELLOW", "GUI", 30, 255, nothing)
+    cv2.createTrackbar("US_YELLOW", "GUI", 180, 255, nothing)
+    cv2.createTrackbar("UV_YELLOW", "GUI", 240, 255, nothing)
 
-    cv2.createTrackbar("LH_GREEN", "GUI", 31, 255, nothing)
-    cv2.createTrackbar("LS_GREEN", "GUI", 22, 255, nothing)
-    cv2.createTrackbar("LV_GREEN", "GUI", 121, 255, nothing)
-    cv2.createTrackbar("UH_GREEN", "GUI", 90, 255, nothing)
-    cv2.createTrackbar("US_GREEN", "GUI", 81, 255, nothing)
-    cv2.createTrackbar("UV_GREEN", "GUI", 217, 255, nothing)
+    cv2.createTrackbar("LH_GREEN", "GUI", 50, 255, nothing)
+    cv2.createTrackbar("LS_GREEN", "GUI", 0, 255, nothing)
+    cv2.createTrackbar("LV_GREEN", "GUI", 0, 255, nothing)
+    cv2.createTrackbar("UH_GREEN", "GUI", 80, 255, nothing)
+    cv2.createTrackbar("US_GREEN", "GUI", 255, 255, nothing)
+    cv2.createTrackbar("UV_GREEN", "GUI", 255, 255, nothing)
 
-    cv2.createTrackbar("LH_RED", "GUI", 0, 255, nothing)
-    cv2.createTrackbar("LS_RED", "GUI", 53, 255, nothing)
-    cv2.createTrackbar("LV_RED", "GUI", 224, 255, nothing)
-    cv2.createTrackbar("UH_RED", "GUI", 8, 255, nothing)
-    cv2.createTrackbar("US_RED", "GUI", 156, 255, nothing)
-    cv2.createTrackbar("UV_RED", "GUI", 255, 255, nothing)
+    cv2.createTrackbar("LH_RED", "GUI", 5, 255, nothing)
+    cv2.createTrackbar("LS_RED", "GUI", 50, 255, nothing)
+    cv2.createTrackbar("LV_RED", "GUI", 140, 255, nothing)
+    cv2.createTrackbar("UH_RED", "GUI", 15, 255, nothing)
+    cv2.createTrackbar("US_RED", "GUI", 215, 255, nothing)
+    cv2.createTrackbar("UV_RED", "GUI", 240, 255, nothing)
 
-    cv2.createTrackbar("LH_BLUE", "GUI", 97, 255, nothing)
-    cv2.createTrackbar("LS_BLUE", "GUI", 208, 255, nothing)
-    cv2.createTrackbar("LV_BLUE", "GUI", 144, 255, nothing)
-    cv2.createTrackbar("UH_BLUE", "GUI", 115, 255, nothing)
+    cv2.createTrackbar("LH_BLUE", "GUI", 73, 255, nothing)
+    cv2.createTrackbar("LS_BLUE", "GUI", 0, 255, nothing)
+    cv2.createTrackbar("LV_BLUE", "GUI", 0, 255, nothing)
+    cv2.createTrackbar("UH_BLUE", "GUI", 130, 255, nothing)
     cv2.createTrackbar("US_BLUE", "GUI", 255, 255, nothing)
     cv2.createTrackbar("UV_BLUE", "GUI", 255, 255, nothing)
 
@@ -101,7 +100,8 @@ def find(mask):
     x = y = 0
     contours, h = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours:
-        if cv2.contourArea(contour) > 500:
+        area = cv2.contourArea(contour)
+        if area > 100:
             x, y, w, h = cv2.boundingRect(contour)
             return x + w//2, y + h//2
     return x, y
