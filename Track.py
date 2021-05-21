@@ -4,11 +4,11 @@ from pyModbusTCP.client import ModbusClient
 import time
 
 
-client = ModbusClient("192.168.0.124", 502)
+client = ModbusClient("192.168.1.192", 502)
 while not client.open():
     print("Connecting to Modbus...")
 print("Connected to Modbus!")
-Cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+Cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 Kuka.init_GUI()
 
 while True:
@@ -58,7 +58,7 @@ while True:
 
     client.write_single_register(32001, x)
     client.write_single_register(32002, y)
-    #client.write_single_register(32003, color)
+    client.write_single_register(32003, color)
     cv2.imshow("result", frame)
     key = cv2.waitKey(5)
 
