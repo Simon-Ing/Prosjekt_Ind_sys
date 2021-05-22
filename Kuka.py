@@ -8,7 +8,8 @@ def nothing(x):
 
 
 def init_GUI():
-    layout = [[sg.Text('YELLOW', text_color='Black', background_color='yellow', font=('helvetica', 15))],
+    layout = [[sg.Button('Quit', key='quit', )],
+              [sg.Text('YELLOW', text_color='Black', background_color='yellow', font=('helvetica', 15))],
               [sg.Text('hue'),
                sg.Slider((0, 179), 0, key='yhl', enable_events=True),
                sg.Slider((0, 179), 179, key='yhu', enable_events=True),
@@ -90,6 +91,8 @@ def init_GUI():
 def calibrate(window):
 
     event, values = window.read()
+    if event == 'quit':
+        window.close()
 
     yellow_lower = (values['yhl'], values['ysl'], values['yvl'])
     yellow_upper = (values['yhu'], values['ysu'], values['yvu'])
@@ -103,7 +106,7 @@ def calibrate(window):
     blue_lower = (values['bhl'], values['bsl'], values['bvl'])
     blue_upper = (values['bhu'], values['bsu'], values['bvu'])
 
-    return yellow_lower, yellow_upper, green_lower, green_upper, red_lower, red_upper, blue_lower, blue_upper
+    return event, (yellow_lower, yellow_upper, green_lower, green_upper, red_lower, red_upper, blue_lower, blue_upper)
 
 
 def show_cal_screen(hsv, frame, thresholds):

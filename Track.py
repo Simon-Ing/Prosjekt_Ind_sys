@@ -7,26 +7,30 @@ import threading
 # Declare the initial threshold values
 thresholds = ((0.0, 0.0, 0.0), (179.0, 255.0, 255.0), (0.0, 0.0, 0.0), (179.0, 255.0, 255.0), (0.0, 0.0, 0.0),
               (179.0, 255.0, 255.0), (0.0, 0.0, 0.0), (179.0, 255.0, 255.0))
+event = ''
 
 
 # Define the calibration function that will run continuously via multithreading
 def calibration():
+    global event
     global thresholds
     while True:
-        thresholds = Kuka.calibrate(window)  # Update the threshold values
+        event, thresholds = Kuka.calibrate(window)  # Update the threshold values
 
-
-client = ModbusClient("192.168.1.192", 502)  # Connect to modbus
+# Connect to modbus
+client = ModbusClient("192.168.1.192", 502)
 while not client.open():
     print("Connecting to Modbus...")
 print("Connected to Modbus!")
+
 Cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)     # Initialize camera
 window = Kuka.init_GUI()                     # Initialize GUI
 calibrate_thread = threading.Thread(target=calibration)  # Declare a thread to run the calibration function
-calibrate_thread.start()                                 # start the thread
+calibrate_thread.start()                                 # Start the thread
 
+# Main loop
 while True:
-    color, x, y, = 0, 0, 0
+    color, x, y, = 0, 0, 0  # Set x, y, and color variables to zero
 
     # read from modbus
     yellow = client.read_coils(10)[0]
@@ -34,10 +38,9 @@ while True:
     red = client.read_coils(12)[0]
     blue = client.read_coils(13)[0]
 
-    ret, frame = Cap.read()                         # Read from camers
+    ret, frame = Cap.read()                         # Read from camera
     blur = cv2.GaussianBlur(frame, (25, 25), 10)    # Blur the image
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)     # make a HSV version of the blurred image
-
     Kuka.show_cal_screen(hsv, frame, thresholds)    # Show the calibration screen
 
     # If yellow variable is True, make a mask from the threshold values and find the position of the object-
@@ -82,6 +85,8 @@ while True:
     # if esc key is pressed, break the loop and end the program
     key = cv2.waitKey(5)
     if key == 27:
+        break
+    if event == 'quit':
         break
 
 Cap.release()
