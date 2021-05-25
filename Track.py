@@ -1,7 +1,6 @@
 import cv2
 import Kuka
 from pyModbusTCP.client import ModbusClient
-import time
 import threading
 
 # Declare the initial threshold values
@@ -18,7 +17,7 @@ def calibration():
         event, thresholds = Kuka.calibrate(window)  # Update the threshold values
 
 # Connect to modbus
-client = ModbusClient("192.168.0.101", 502)
+client = ModbusClient("192.168.0.124", 502)
 while not client.open():
     print("Connecting to Modbus...")
 print("Connected to Modbus!")
