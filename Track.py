@@ -18,12 +18,12 @@ def calibration():
         event, thresholds = Kuka.calibrate(window)  # Update the threshold values
 
 # Connect to modbus
-client = ModbusClient("192.168.1.192", 502)
+client = ModbusClient("192.168.0.101", 502)
 while not client.open():
     print("Connecting to Modbus...")
 print("Connected to Modbus!")
 
-Cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)     # Initialize camera
+Cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)     # Initialize camera
 window = Kuka.init_GUI()                     # Initialize GUI
 calibrate_thread = threading.Thread(target=calibration)  # Declare a thread to run the calibration function
 calibrate_thread.start()                                 # Start the thread
@@ -43,36 +43,43 @@ while True:
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)     # make a HSV version of the blurred image
     Kuka.show_cal_screen(hsv, frame, thresholds)    # Show the calibration screen
 
+
     # If yellow variable is True, make a mask from the threshold values and find the position of the object-
     # draw a circle on the object and write "yellow" by the circle, set color variable to 1 representing yellow
     if yellow:
         mask = cv2.inRange(hsv, thresholds[0], thresholds[1])
-        x, y = Kuka.find(mask)
+        found, x, y = Kuka.find(mask)
         cv2.circle(frame, (x, y), 7, (0, 0, 0), -1)
         cv2.putText(frame, "Yellow", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        color = 1
+        if found:
+            color = 1
 
     # If green variable is True and no yellow object was found, do the same as above for green, then red, then blue
     if green and color == 0:
         mask = cv2.inRange(hsv, thresholds[2], thresholds[3])
-        x, y = Kuka.find(mask)
+        found, x, y = Kuka.find(mask)
         cv2.circle(frame, (x, y), 7, (0, 0, 0), -1)
         cv2.putText(frame, "Green", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        color = 2
+        if found:
+            color = 2
 
     if red and color == 0:
         mask = cv2.inRange(hsv, thresholds[4], thresholds[5])
-        x, y = Kuka.find(mask)
+        found, x, y = Kuka.find(mask)
         cv2.circle(frame, (x, y), 7, (0, 0, 0), -1)
         cv2.putText(frame, "Red", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        color = 3
+        if found:
+            color = 3
 
     if blue and color == 0:
         mask = cv2.inRange(hsv, thresholds[6], thresholds[7])
-        x, y = Kuka.find(mask)
+        found, x, y = Kuka.find(mask)
         cv2.circle(frame, (x, y), 7, (0, 0, 0), -1)
         cv2.putText(frame, "Blue", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        color = 4
+        if found:
+            color = 4
+
+    print(yellow, green, red, blue, color)
 
     # write variables for x- and y-position and color to modbus
     client.write_single_register(32001, x)
