@@ -1,6 +1,8 @@
 import time
 from pyModbusTCP.client import ModbusClient
-client = ModbusClient("192.168.1.192", 502)
+
+# This script is used during debugging to write to modbus registers and coils
+client = ModbusClient("192.168.68.113", 502)
 print("open:", client.open())
 while True:
     action = input("action: ")

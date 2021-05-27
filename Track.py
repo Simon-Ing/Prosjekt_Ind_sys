@@ -3,6 +3,8 @@ import Kuka
 from pyModbusTCP.client import ModbusClient
 import threading
 
+# This is the main python program in the project "Kuka Robot - Industrielle Styresystemer 2021"
+
 # Declare the initial threshold values
 thresholds = ((0.0, 0.0, 0.0), (179.0, 255.0, 255.0), (0.0, 0.0, 0.0), (179.0, 255.0, 255.0), (0.0, 0.0, 0.0),
               (179.0, 255.0, 255.0), (0.0, 0.0, 0.0), (179.0, 255.0, 255.0))
@@ -31,8 +33,8 @@ calibrate_thread.start()                                 # Start the thread
 while True:
     color, x, y, = 0, 0, 0  # Set x, y, and color variables to zero
 
+    # read from modbus
     try:
-        # read from modbus
         yellow = client.read_coils(10)[0]
         green = client.read_coils(11)[0]
         red = client.read_coils(12)[0]
@@ -83,8 +85,6 @@ while True:
         cv2.putText(frame, "Blue", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
         if found:
             color = 4
-
-    # print(yellow, green, red, blue, color)
 
     # write variables for x- and y-position and color to modbus
     client.write_single_register(32001, x)

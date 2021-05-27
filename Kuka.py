@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import PySimpleGUI as sg
 
+# This library contains all functions used in the project
 
 def aruco(img, object_corners=[0, 1, 2, 3]):
     marker_corners = []
@@ -155,7 +156,6 @@ def show_cal_screen(hsv, frame, thresholds):
     bottom = np.hstack((res_red, res_blue))
     img = np.vstack((top, bottom))
     cv2.imshow("Calibration", cv2.resize(img, (0, 0), fx=0.6, fy=0.6))
-
 
 
 def find(mask):

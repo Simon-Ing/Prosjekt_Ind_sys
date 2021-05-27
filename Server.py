@@ -1,22 +1,13 @@
-from pyModbusTCP.server import ModbusServer, DataBank
-from time import sleep
+from pyModbusTCP.server import ModbusServer
 
-server = ModbusServer("192.168.1.192", 502)
-
+# This script is used during debugging to set up a modbus server
+server = ModbusServer("192.168.68.113", 502)
 print(server.host)
 
-
 try:
-    print("Start server...")
     server.start()
-    print("Server is online")
-    state = [0]
     while True:
-        #DataBank.set_words(0, [int(uniform(0, 100))])
-        if state != DataBank.get_words(1):
-            state = DataBank.get_words(1)
-            print("Value of Register 1 has changed to " +str(state))
-        sleep(0.5)
+        pass
 
 except:
     print("Shutdown server ...")
