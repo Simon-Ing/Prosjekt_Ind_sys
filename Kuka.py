@@ -3,8 +3,67 @@ import numpy as np
 import PySimpleGUI as sg
 
 
-def nothing(x):
-    pass
+def aruco(img, object_corners=[0, 1, 2, 3]):
+    marker_corners = []
+    coordinates = []
+    marker_active = [False, False, False, False]
+    for i in range(0, 35):
+        marker_corners.append((1, 1, 1, 1))
+        coordinates.append((1, 1))
+
+    all_markers_active = False
+
+    # Load AruCo markers, in this case we are using the 50 first 6x6 AruCo Markers.
+    aruco_dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
+    aruco_parameters = cv2.aruco.DetectorParameters_create()
+    (corners, ids, rejected) = cv2.aruco.detectMarkers(img, aruco_dictionary, parameters=aruco_parameters)
+
+    # Check if any markers have been detected. If not, return unaltered image.
+    if len(corners) > 0:
+        ids = ids.flatten()
+        for (markerCorner, markerID) in zip(corners, ids):
+
+            # Mark the detected markerID's in object corner  as active.
+            if markerID in object_corners:
+                marker_active[markerID] = True
+
+            corners = markerCorner.reshape((4, 2))
+            (topLeft, topRight, bottomRight, bottomLeft) = corners
+
+            topRight = (int(topRight[0]), int(topRight[1]))
+            bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
+            bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
+            topLeft = (int(topLeft[0]), int(topLeft[1]))
+
+            cX = int((topLeft[0] + bottomRight[0]) / 2.0)
+            cY = int((topLeft[1] + bottomRight[1]) / 2.0)
+
+            coordinates[markerID] = (cX, cY)
+            marker_corners[markerID] = (topLeft, topRight, bottomLeft, bottomRight)
+
+        # If all corners are detected and warp is enabled, warp the frame and marker coordinates.
+        if all(marker_active):
+            all_markers_active = True
+
+            marker_active[object_corners[0]] = False
+            marker_active[object_corners[1]] = False
+            marker_active[object_corners[2]] = False
+            marker_active[object_corners[3]] = False
+
+            # Dimensions of the frame.
+            dimensions = (img.shape[1], img.shape[0])
+
+            # Declare
+            pts1 = np.float32(
+                [marker_corners[object_corners[0]][0], marker_corners[object_corners[1]][1],
+                 marker_corners[object_corners[2]][2], marker_corners[object_corners[3]][3]])
+            pts2 = np.float32([[0, 0], [dimensions[0], 0], [0, dimensions[1]], [dimensions[0], dimensions[1]]])
+
+            # Calculate the perspective transform.
+            matrix = cv2.getPerspectiveTransform(pts1, pts2)
+
+            return True, matrix
+    return False, None
 
 
 def init_GUI():
@@ -57,36 +116,6 @@ def init_GUI():
     window = sg.Window('Title', layout)
     return window
 
-# def init_GUI():
-#     cv2.namedWindow("GUI", cv2.WINDOW_NORMAL)
-#     cv2.createTrackbar("LH_YELLOW", "GUI", 25, 255, nothing)
-#     cv2.createTrackbar("LS_YELLOW", "GUI", 30, 255, nothing)
-#     cv2.createTrackbar("LV_YELLOW", "GUI", 100, 255, nothing)
-#     cv2.createTrackbar("UH_YELLOW", "GUI", 30, 255, nothing)
-#     cv2.createTrackbar("US_YELLOW", "GUI", 180, 255, nothing)
-#     cv2.createTrackbar("UV_YELLOW", "GUI", 240, 255, nothing)
-#
-#     cv2.createTrackbar("LH_GREEN", "GUI", 50, 255, nothing)
-#     cv2.createTrackbar("LS_GREEN", "GUI", 0, 255, nothing)
-#     cv2.createTrackbar("LV_GREEN", "GUI", 0, 255, nothing)
-#     cv2.createTrackbar("UH_GREEN", "GUI", 80, 255, nothing)
-#     cv2.createTrackbar("US_GREEN", "GUI", 255, 255, nothing)
-#     cv2.createTrackbar("UV_GREEN", "GUI", 255, 255, nothing)
-#
-#     cv2.createTrackbar("LH_RED", "GUI", 5, 255, nothing)
-#     cv2.createTrackbar("LS_RED", "GUI", 50, 255, nothing)
-#     cv2.createTrackbar("LV_RED", "GUI", 140, 255, nothing)
-#     cv2.createTrackbar("UH_RED", "GUI", 15, 255, nothing)
-#     cv2.createTrackbar("US_RED", "GUI", 215, 255, nothing)
-#     cv2.createTrackbar("UV_RED", "GUI", 240, 255, nothing)
-#
-#     cv2.createTrackbar("LH_BLUE", "GUI", 73, 255, nothing)
-#     cv2.createTrackbar("LS_BLUE", "GUI", 0, 255, nothing)
-#     cv2.createTrackbar("LV_BLUE", "GUI", 0, 255, nothing)
-#     cv2.createTrackbar("UH_BLUE", "GUI", 130, 255, nothing)
-#     cv2.createTrackbar("US_BLUE", "GUI", 255, 255, nothing)
-#     cv2.createTrackbar("UV_BLUE", "GUI", 255, 255, nothing)
-
 
 def calibrate(window):
 
@@ -126,66 +155,7 @@ def show_cal_screen(hsv, frame, thresholds):
     bottom = np.hstack((res_red, res_blue))
     img = np.vstack((top, bottom))
     cv2.imshow("Calibration", cv2.resize(img, (0, 0), fx=0.6, fy=0.6))
-#
-#
-# def calibrate(frame):
-#     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-#
-#     l_h_y = cv2.getTrackbarPos("LH_YELLOW", "GUI")
-#     l_s_y = cv2.getTrackbarPos("LS_YELLOW", "GUI")
-#     l_v_y = cv2.getTrackbarPos("LV_YELLOW", "GUI")
-#     u_h_y = cv2.getTrackbarPos("UH_YELLOW", "GUI")
-#     u_s_y = cv2.getTrackbarPos("US_YELLOW", "GUI")
-#     u_v_y = cv2.getTrackbarPos("UV_YELLOW", "GUI")
-#     l_b_y = np.array([l_h_y, l_s_y, l_v_y])
-#     u_b_y = np.array([u_h_y, u_s_y, u_v_y])
-#     mask_yellow = cv2.inRange(hsv, l_b_y, u_b_y)
-#     res_yellow = cv2.bitwise_and(frame, frame, mask=mask_yellow)
-#     cv2.putText(res_yellow, "Yellow", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 200), 2)
-#
-#     l_h_g = cv2.getTrackbarPos("LH_GREEN", "GUI")
-#     l_s_g = cv2.getTrackbarPos("LS_GREEN", "GUI")
-#     l_v_g = cv2.getTrackbarPos("LV_GREEN", "GUI")
-#     u_h_g = cv2.getTrackbarPos("UH_GREEN", "GUI")
-#     u_s_g = cv2.getTrackbarPos("US_GREEN", "GUI")
-#     u_v_g = cv2.getTrackbarPos("UV_GREEN", "GUI")
-#     l_b_g = np.array([l_h_g, l_s_g, l_v_g])
-#     u_b_g = np.array([u_h_g, u_s_g, u_v_g])
-#     mask_green = cv2.inRange(hsv, l_b_g, u_b_g)
-#     res_green = cv2.bitwise_and(frame, frame, mask=mask_green)
-#     cv2.putText(res_green, "Green", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-#
-#     l_h_r = cv2.getTrackbarPos("LH_RED", "GUI")
-#     l_s_r = cv2.getTrackbarPos("LS_RED", "GUI")
-#     l_v_r = cv2.getTrackbarPos("LV_RED", "GUI")
-#     u_h_r = cv2.getTrackbarPos("UH_RED", "GUI")
-#     u_s_r = cv2.getTrackbarPos("US_RED", "GUI")
-#     u_v_r = cv2.getTrackbarPos("UV_RED", "GUI")
-#     l_b_r = np.array([l_h_r, l_s_r, l_v_r])
-#     u_b_r = np.array([u_h_r, u_s_r, u_v_r])
-#     mask_red = cv2.inRange(hsv, l_b_r, u_b_r)
-#     res_red = cv2.bitwise_and(frame, frame, mask=mask_red)
-#     cv2.putText(res_red, "Red", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-#
-#     l_h_b = cv2.getTrackbarPos("LH_BLUE", "GUI")
-#     l_s_b = cv2.getTrackbarPos("LS_BLUE", "GUI")
-#     l_v_b = cv2.getTrackbarPos("LV_BLUE", "GUI")
-#     u_h_b = cv2.getTrackbarPos("UH_BLUE", "GUI")
-#     u_s_b = cv2.getTrackbarPos("US_BLUE", "GUI")
-#     u_v_b = cv2.getTrackbarPos("UV_BLUE", "GUI")
-#     l_b_b = np.array([l_h_b, l_s_b, l_v_b])
-#     u_b_b = np.array([u_h_b, u_s_b, u_v_b])
-#     mask_blue = cv2.inRange(hsv, l_b_b, u_b_b)
-#     res_blue = cv2.bitwise_and(frame, frame, mask=mask_blue)
-#     cv2.putText(res_blue, "Blue", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-#     # cv2.imshow("blue", res_blue)
-#
-#     top = np.hstack((res_yellow, res_green))
-#     bottom = np.hstack((res_red, res_blue))
-#     img = np.vstack((top, bottom))
-#     cv2.imshow("Calibration", cv2.resize(img, (0, 0), fx=0.6, fy=0.6))
-#     return l_b_y, u_b_y, l_b_g, u_b_g, l_b_r, u_b_r, l_b_b, u_b_b
-#
+
 
 
 def find(mask):
