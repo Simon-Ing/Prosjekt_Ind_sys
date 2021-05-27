@@ -70,47 +70,47 @@ def init_GUI():
     layout = [[sg.Button('Quit', key='quit', )],
               [sg.Text('YELLOW', text_color='Black', background_color='yellow', font=('helvetica', 15))],
               [sg.Text('hue'),
-               sg.Slider((0, 179), 0, key='yhl', enable_events=True),
-               sg.Slider((0, 179), 179, key='yhu', enable_events=True),
+               sg.Slider((0, 179), 13, key='yhl', enable_events=True),
+               sg.Slider((0, 179), 32, key='yhu', enable_events=True),
                sg.Text('sat'),
-               sg.Slider((0, 255), 0, key='ysl', enable_events=True),
-               sg.Slider((0, 255), 255, key='ysu', enable_events=True),
+               sg.Slider((0, 255), 111, key='ysl', enable_events=True),
+               sg.Slider((0, 255), 228, key='ysu', enable_events=True),
                sg.Text('val'),
-               sg.Slider((0, 255), 0, key='yvl', enable_events=True),
-               sg.Slider((0, 255), 255, key='yvu', enable_events=True)],
+               sg.Slider((0, 255), 96, key='yvl', enable_events=True),
+               sg.Slider((0, 255), 148, key='yvu', enable_events=True)],
 
               [sg.Text('GREEN', text_color='Black', background_color='green', font=('helvetica', 15))],
               [sg.Text('hue'),
-               sg.Slider((0, 179), 0, key='ghl', enable_events=True),
-               sg.Slider((0, 179), 179, key='ghu', enable_events=True),
+               sg.Slider((0, 179), 59, key='ghl', enable_events=True),
+               sg.Slider((0, 179), 88, key='ghu', enable_events=True),
                sg.Text('sat'),
-               sg.Slider((0, 255), 0, key='gsl', enable_events=True),
-               sg.Slider((0, 255), 255, key='gsu', enable_events=True),
+               sg.Slider((0, 255), 8, key='gsl', enable_events=True),
+               sg.Slider((0, 255), 50, key='gsu', enable_events=True),
                sg.Text('val'),
-               sg.Slider((0, 255), 0, key='gvl', enable_events=True),
-               sg.Slider((0, 255), 255, key='gvu', enable_events=True)],
+               sg.Slider((0, 255), 84, key='gvl', enable_events=True),
+               sg.Slider((0, 255), 138, key='gvu', enable_events=True)],
 
               [sg.Text('RED', text_color='Black', background_color='red', font=('helvetica', 15))],
               [sg.Text('hue'),
                sg.Slider((0, 179), 0, key='rhl', enable_events=True),
-               sg.Slider((0, 179), 179, key='rhu', enable_events=True),
+               sg.Slider((0, 179), 10, key='rhu', enable_events=True),
                sg.Text('sat'),
-               sg.Slider((0, 255), 0, key='rsl', enable_events=True),
-               sg.Slider((0, 255), 255, key='rsu', enable_events=True),
+               sg.Slider((0, 255), 120, key='rsl', enable_events=True),
+               sg.Slider((0, 255), 230, key='rsu', enable_events=True),
                sg.Text('val'),
-               sg.Slider((0, 255), 0, key='rvl', enable_events=True),
-               sg.Slider((0, 255), 255, key='rvu', enable_events=True)],
+               sg.Slider((0, 255), 84, key='rvl', enable_events=True),
+               sg.Slider((0, 255), 138, key='rvu', enable_events=True)],
 
               [sg.Text('BLUE', text_color='Black', background_color='blue', font=('helvetica', 15))],
               [sg.Text('hue'),
-               sg.Slider((0, 179), 0, key='bhl', enable_events=True),
-               sg.Slider((0, 179), 179, key='bhu', enable_events=True),
+               sg.Slider((0, 179), 119, key='bhl', enable_events=True),
+               sg.Slider((0, 179), 132, key='bhu', enable_events=True),
                sg.Text('sat'),
-               sg.Slider((0, 255), 0, key='bsl', enable_events=True),
-               sg.Slider((0, 255), 255, key='bsu', enable_events=True),
+               sg.Slider((0, 255), 4, key='bsl', enable_events=True),
+               sg.Slider((0, 255), 29, key='bsu', enable_events=True),
                sg.Text('val'),
-               sg.Slider((0, 255), 0, key='bvl', enable_events=True),
-               sg.Slider((0, 255), 255, key='bvu', enable_events=True)]
+               sg.Slider((0, 255), 119, key='bvl', enable_events=True),
+               sg.Slider((0, 255), 159, key='bvu', enable_events=True)]
               ]
 
     window = sg.Window('Title', layout)
@@ -120,7 +120,7 @@ def init_GUI():
 def calibrate(window):
 
     event, values = window.read()
-    if event == 'quit':
+    if event in ('quit', None):
         window.close()
 
     yellow_lower = (values['yhl'], values['ysl'], values['yvl'])
@@ -165,5 +165,5 @@ def find(mask):
         area = cv2.contourArea(contour)
         if area > 100:
             x, y, w, h = cv2.boundingRect(contour)
-            return x + w//2, y + h//2
-    return x, y
+            return True, x + w//2, y + h//2
+    return False, x, y
