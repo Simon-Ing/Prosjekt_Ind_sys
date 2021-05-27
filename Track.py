@@ -17,12 +17,12 @@ def calibration():
         event, thresholds = Kuka.calibrate(window)  # Update the threshold values
 
 # Connect to modbus
-client = ModbusClient("192.168.1.192", 502)
-while not client.open():
-    print("Connecting to Modbus...")
+print("Connecting to Modbus...")
+client = ModbusClient("192.168.0.124", 502)
+client.open()
 print("Connected to Modbus!")
 
-Cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)     # Initialize camera
+Cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)     # Initialize camera
 window = Kuka.init_GUI()                     # Initialize GUI
 calibrate_thread = threading.Thread(target=calibration)  # Declare a thread to run the calibration function
 calibrate_thread.start()                                 # Start the thread
@@ -31,12 +31,18 @@ calibrate_thread.start()                                 # Start the thread
 while True:
     color, x, y, = 0, 0, 0  # Set x, y, and color variables to zero
 
-    # read from modbus
-    yellow = client.read_coils(10)[0]
-    green = client.read_coils(11)[0]
-    red = client.read_coils(12)[0]
-    blue = client.read_coils(13)[0]
+    try:
+        # read from modbus
+        yellow = client.read_coils(10)[0]
+        green = client.read_coils(11)[0]
+        red = client.read_coils(12)[0]
+        blue = client.read_coils(13)[0]
+    except TypeError:
+        print("Modbus Error")
+        yellow, green, red, blue = False, False, False, False
+        pass
 
+    print(yellow, green, red, blue)
     ret, frame = Cap.read()                         # Read from camera
     blur = cv2.GaussianBlur(frame, (25, 25), 10)    # Blur the image
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)     # make a HSV version of the blurred image
