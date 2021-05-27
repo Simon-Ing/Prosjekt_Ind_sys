@@ -17,12 +17,12 @@ def calibration():
         event, thresholds = Kuka.calibrate(window)  # Update the threshold values
 
 # Connect to modbus
-client = ModbusClient("192.168.0.124", 502)
+client = ModbusClient("192.168.1.192", 502)
 while not client.open():
     print("Connecting to Modbus...")
 print("Connected to Modbus!")
 
-Cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)     # Initialize camera
+Cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)     # Initialize camera
 window = Kuka.init_GUI()                     # Initialize GUI
 calibrate_thread = threading.Thread(target=calibration)  # Declare a thread to run the calibration function
 calibrate_thread.start()                                 # Start the thread
@@ -78,7 +78,7 @@ while True:
         if found:
             color = 4
 
-    print(yellow, green, red, blue, color)
+    # print(yellow, green, red, blue, color)
 
     # write variables for x- and y-position and color to modbus
     client.write_single_register(32001, x)

@@ -1,6 +1,6 @@
 import time
 from pyModbusTCP.client import ModbusClient
-client = ModbusClient("192.168.0.101", 502)
+client = ModbusClient("192.168.1.192", 502)
 print("open:", client.open())
 while True:
     action = input("action: ")

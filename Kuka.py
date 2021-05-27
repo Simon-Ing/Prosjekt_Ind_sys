@@ -67,7 +67,7 @@ def aruco(img, object_corners=[0, 1, 2, 3]):
 
 
 def init_GUI():
-    layout = [[sg.Button('Quit', key='quit', )],
+    layout = [[sg.Button('Start', key='start', enable_events=True), sg.Button('Quit', key='quit', )],
               [sg.Text('YELLOW', text_color='Black', background_color='yellow', font=('helvetica', 15))],
               [sg.Text('hue'),
                sg.Slider((0, 179), 13, key='yhl', enable_events=True),
@@ -120,7 +120,7 @@ def init_GUI():
 def calibrate(window):
 
     event, values = window.read()
-    if event in ('quit', None):
+    if event in ('quit', sg.WIN_CLOSED ):
         window.close()
 
     yellow_lower = (values['yhl'], values['ysl'], values['yvl'])
